@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import type { ReactNode } from 'react';
 import './globals.css';
 import Nav from '@/components/Nav';
 
@@ -7,7 +8,7 @@ export const metadata: Metadata = {
   description: 'カレンダー・タスク・買い物リスト管理',
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="ja">
       <body className="min-h-screen bg-gray-50">

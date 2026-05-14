@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import type { MouseEvent } from 'react';
 import type { Schedule } from '@/lib/supabase';
 
 const WEEKDAYS = ['日', '月', '火', '水', '木', '金', '土'];
@@ -66,7 +67,7 @@ export default function CalendarPage() {
     setModal({ open: true, date: `${month}/${day}`, schedule: null });
   };
 
-  const openEdit = (s: Schedule, e: React.MouseEvent) => {
+  const openEdit = (s: Schedule, e: MouseEvent) => {
     e.stopPropagation();
     setForm({
       title: s.title,
