@@ -46,3 +46,12 @@ export interface Memo {
   tags: string[];
   created_at: string;
 }
+
+export interface App {
+  id: string;
+  user_id: string;
+  name: string;
+  url: string;
+  keywords: string[];
+  created_at: string;
+}

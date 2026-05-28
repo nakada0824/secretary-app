@@ -8,6 +8,7 @@ const links = [
   { href: '/tasks',    label: 'タスク',      icon: '✅' },
   { href: '/shopping', label: '買い物',      icon: '🛒' },
   { href: '/memo',     label: 'メモ',        icon: '📝' },
+  { href: '/portal',  label: 'アプリ',      icon: '📱' },
 ];
 
 export default function Nav() {
