@@ -7,6 +7,7 @@ const links = [
   { href: '/calendar', label: 'カレンダー', icon: '📅' },
   { href: '/tasks',    label: 'タスク',      icon: '✅' },
   { href: '/shopping', label: '買い物',      icon: '🛒' },
+  { href: '/memo',     label: 'メモ',        icon: '📝' },
 ];
 
 export default function Nav() {

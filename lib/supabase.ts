@@ -38,3 +38,11 @@ export interface ShoppingItem {
   checked: boolean;
   created_at: string;
 }
+
+export interface Memo {
+  id: string;
+  user_id: string;
+  content: string;
+  tags: string[];
+  created_at: string;
+}
