@@ -1,15 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase, USER_ID } from '@/lib/supabase';
+import { query, insertRow, errorResponse, USER_ID, type App } from '@/lib/db';
 
 export async function GET() {
-  const { data, error } = await supabase
-    .from('apps')
-    .select('*')
-    .eq('user_id', USER_ID)
-    .order('created_at', { ascending: true });
-
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json(data);
+  try {
+    const data = await query<App>(
+      'SELECT * FROM apps WHERE user_id = $1 ORDER BY created_at ASC',
+      [USER_ID]
+    );
+    return NextResponse.json(data);
+  } catch (e) {
+    return errorResponse(e);
+  }
 }
 
 export async function POST(req: NextRequest) {
@@ -18,17 +19,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'name and url are required' }, { status: 400 });
   }
 
-  const { data, error } = await supabase
-    .from('apps')
-    .insert({
+  try {
+    const data = await insertRow<App>('apps', {
       user_id: USER_ID,
       name: body.name.trim(),
       url: body.url.trim(),
       keywords: Array.isArray(body.keywords) ? body.keywords : [],
-    })
-    .select()
-    .single();
-
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json(data, { status: 201 });
+    });
+    return NextResponse.json(data, { status: 201 });
+  } catch (e) {
+    return errorResponse(e);
+  }
 }

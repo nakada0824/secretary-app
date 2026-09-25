@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import type { Memo } from '@/lib/supabase';
+import type { Memo } from '@/lib/db';
 
 function parseTags(raw: string): string[] {
   return raw

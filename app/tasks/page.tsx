@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import type { Task } from '@/lib/supabase';
+import type { Task } from '@/lib/db';
 
 const PRIORITY_LABEL: Record<number, string> = { 1: '最低', 2: '低', 3: '中', 4: '高', 5: '最高' };
 const PRIORITY_COLOR: Record<number, string> = {

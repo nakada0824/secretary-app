@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase, USER_ID } from '@/lib/supabase';
+import { query, insertRow, pickColumns, errorResponse, USER_ID, type Schedule } from '@/lib/db';
+
+const COLUMNS = ['title', 'description', 'start_time', 'end_time', 'location'] as const;
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -9,26 +11,25 @@ export async function GET(req: NextRequest) {
   const start = new Date(year, month - 1, 1).toISOString();
   const end   = new Date(year, month, 0, 23, 59, 59).toISOString();
 
-  const { data, error } = await supabase
-    .from('schedules')
-    .select('*')
-    .eq('user_id', USER_ID)
-    .gte('start_time', start)
-    .lte('start_time', end)
-    .order('start_time');
-
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json(data);
+  try {
+    const data = await query<Schedule>(
+      `SELECT * FROM schedules
+       WHERE user_id = $1 AND start_time >= $2 AND start_time <= $3
+       ORDER BY start_time`,
+      [USER_ID, start, end]
+    );
+    return NextResponse.json(data);
+  } catch (e) {
+    return errorResponse(e);
+  }
 }
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
-  const { data, error } = await supabase
-    .from('schedules')
-    .insert({ ...body, user_id: USER_ID })
-    .select()
-    .single();
-
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json(data, { status: 201 });
+  try {
+    const data = await insertRow<Schedule>('schedules', { ...pickColumns(body, COLUMNS), user_id: USER_ID });
+    return NextResponse.json(data, { status: 201 });
+  } catch (e) {
+    return errorResponse(e);
+  }
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import type { ShoppingItem } from '@/lib/supabase';
+import type { ShoppingItem } from '@/lib/db';
 
 export default function ShoppingPage() {
   const [items, setItems]     = useState<ShoppingItem[]>([]);

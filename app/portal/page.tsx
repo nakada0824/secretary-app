@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import type { App } from '@/lib/supabase';
+import type { App } from '@/lib/db';
 
 export default function PortalPage() {
   const [apps, setApps]       = useState<App[]>([]);

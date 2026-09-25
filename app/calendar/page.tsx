@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import type { MouseEvent } from 'react';
-import type { Schedule } from '@/lib/supabase';
+import type { Schedule } from '@/lib/db';
 
 const WEEKDAYS = ['日', '月', '火', '水', '木', '金', '土'];
 
