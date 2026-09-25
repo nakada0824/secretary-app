@@ -1,26 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { updateRow, deleteRow, pickColumns, errorResponse, type Schedule } from '@/lib/db';
-
-const COLUMNS = ['title', 'description', 'start_time', 'end_time', 'location'] as const;
+import { updateEvent, deleteEvent, type EventInput } from '@/lib/icloud';
+import { calendarErrorResponse } from '@/lib/calendar-api';
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const body = await req.json();
+
+  const changes: Partial<EventInput> = {};
+  if (body.title !== undefined) changes.title = String(body.title).trim();
+  if (body.start_time !== undefined) changes.start_time = body.start_time;
+  if (body.end_time !== undefined) changes.end_time = body.end_time || null;
+  if (body.all_day !== undefined) changes.all_day = body.all_day === true;
+  if (body.location !== undefined) changes.location = body.location || null;
+  if (body.description !== undefined) changes.description = body.description || null;
+
   try {
-    const data = await updateRow<Schedule>('schedules', id, pickColumns(body, COLUMNS));
-    if (!data) return NextResponse.json({ error: 'not found' }, { status: 404 });
-    return NextResponse.json(data);
+    return NextResponse.json(await updateEvent(id, changes));
   } catch (e) {
-    return errorResponse(e);
+    return calendarErrorResponse(e);
   }
 }
 
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   try {
-    await deleteRow('schedules', id);
+    await deleteEvent(id);
     return NextResponse.json({ ok: true });
   } catch (e) {
-    return errorResponse(e);
+    return calendarErrorResponse(e);
   }
 }

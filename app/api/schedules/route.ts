@@ -1,35 +1,46 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { query, insertRow, pickColumns, errorResponse, USER_ID, type Schedule } from '@/lib/db';
+import { listEvents, createEvent, isWritableCalendar } from '@/lib/icloud';
+import { calendarErrorResponse } from '@/lib/calendar-api';
 
-const COLUMNS = ['title', 'description', 'start_time', 'end_time', 'location'] as const;
+// 予定は iCloud カレンダー（自宅・職場・シフトボード）に直接読み書きする
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const year = parseInt(searchParams.get('year') ?? String(new Date().getFullYear()));
   const month = parseInt(searchParams.get('month') ?? String(new Date().getMonth() + 1));
 
-  const start = new Date(year, month - 1, 1).toISOString();
-  const end   = new Date(year, month, 0, 23, 59, 59).toISOString();
+  // JST の月初 0:00 〜 翌月初 0:00
+  const start = new Date(`${year}-${String(month).padStart(2, '0')}-01T00:00:00+09:00`);
+  const next = month === 12 ? { y: year + 1, m: 1 } : { y: year, m: month + 1 };
+  const end = new Date(`${next.y}-${String(next.m).padStart(2, '0')}-01T00:00:00+09:00`);
 
   try {
-    const data = await query<Schedule>(
-      `SELECT * FROM schedules
-       WHERE user_id = $1 AND start_time >= $2 AND start_time <= $3
-       ORDER BY start_time`,
-      [USER_ID, start, end]
-    );
-    return NextResponse.json(data);
+    return NextResponse.json(await listEvents(start, end));
   } catch (e) {
-    return errorResponse(e);
+    return calendarErrorResponse(e);
   }
 }
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
+  if (!isWritableCalendar(body.calendar)) {
+    return NextResponse.json({ error: '登録先（職場・自宅）を選んでください' }, { status: 400 });
+  }
+  if (!body.title?.trim() || !body.start_time) {
+    return NextResponse.json({ error: 'タイトルと開始日時は必須です' }, { status: 400 });
+  }
+
   try {
-    const data = await insertRow<Schedule>('schedules', { ...pickColumns(body, COLUMNS), user_id: USER_ID });
-    return NextResponse.json(data, { status: 201 });
+    const event = await createEvent(body.calendar, {
+      title: body.title.trim(),
+      start_time: body.start_time,
+      end_time: body.end_time || null,
+      all_day: body.all_day === true,
+      location: body.location || null,
+      description: body.description || null,
+    });
+    return NextResponse.json(event, { status: 201 });
   } catch (e) {
-    return errorResponse(e);
+    return calendarErrorResponse(e);
   }
 }

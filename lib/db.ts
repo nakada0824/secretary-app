@@ -69,17 +69,6 @@ export function errorResponse(e: unknown) {
   return Response.json({ error: e instanceof Error ? e.message : String(e) }, { status: 500 });
 }
 
-export interface Schedule {
-  id: string;
-  user_id: string;
-  title: string;
-  description?: string;
-  start_time: string;
-  end_time?: string;
-  location?: string;
-  created_at: string;
-}
-
 export interface Task {
   id: string;
   user_id: string;
