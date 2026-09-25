@@ -334,8 +334,10 @@ export default function CalendarPage() {
                   <textarea className="input resize-none" rows={2} value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} placeholder="備考など" />
                 </div>
               </fieldset>
-              {!modal.schedule && !form.all_day && (
-                <p className="text-xs text-gray-400 mt-2">🔔 iPhoneに1時間前と30分前に通知します</p>
+              {!modal.schedule && (
+                <p className="text-xs text-gray-400 mt-2">
+                  🔔 iPhoneに{form.all_day ? '3日前・2日前・前日の朝9時' : '3日前・2日前・前日・1時間前・30分前'}に通知します
+                </p>
               )}
               {error && <p className="text-sm text-red-600 mt-3">⚠️ {error}</p>}
               <div className="flex gap-2 mt-5">
